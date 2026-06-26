@@ -1,7 +1,8 @@
 const ids=["address","purchasePrice","arv","sqft","roofSquares","sidingSquares","soffitLf","windows","doors","lvpSqft","paintSqft","kitchenScope","bathScope","miscRepairs","roofPrice","sidingPrice","soffitPrice","windowPrice","doorPrice","lvpPrice","paintPrice","contingencyPct","buyClosing","sellingPct","rent","mortgage","taxes","insurance","utilities","vacancyPct","maintenancePct","demoWeeks","exteriorWeeks","interiorWeeks","punchWeeks","listingWeeks","closingWeeks","holdMortgage","holdTaxes","holdInsurance","holdUtilities","holdLawn","holdMisc"];
+const importMap={address:"address",purchasePrice:"purchasePrice",arv:"arv",sqft:"sqft",roofSquares:"roofSquares",sidingSquares:"sidingSquares",soffitLf:"soffitLf",windows:"windows",doors:"doors",lvpSqft:"lvpSqft",paintSqft:"paintSqft",kitchenScope:"kitchenScope",bathScope:"bathScope",miscRepairs:"miscRepairs",rent:"rent",mortgage:"mortgage",taxes:"taxes",insurance:"insurance",utilities:"utilities",demoWeeks:"demoWeeks",exteriorWeeks:"exteriorWeeks",interiorWeeks:"interiorWeeks",punchWeeks:"punchWeeks",listingWeeks:"listingWeeks",closingWeeks:"closingWeeks"};
 const $=id=>document.getElementById(id), n=id=>Number($(id).value||0), s=id=>$(id).value;
-function money(x){return x.toLocaleString("en-US",{style:"currency",currency:"USD",maximumFractionDigits:0})}
-function pct(x){return (x*100).toFixed(1)+"%"}
+function money(x){return Number(x||0).toLocaleString("en-US",{style:"currency",currency:"USD",maximumFractionDigits:0})}
+function pct(x){return (Number(x||0)*100).toFixed(1)+"%"}
 function showTab(id,btn){document.querySelectorAll(".tab,.tabbtn").forEach(x=>x.classList.remove("active"));$(id).classList.add("active");btn.classList.add("active")}
 function timeline(){
  let weeks=n("demoWeeks")+n("exteriorWeeks")+n("interiorWeeks")+n("punchWeeks")+n("listingWeeks")+n("closingWeeks");
@@ -72,17 +73,73 @@ Use kitchenScope only as 0, 3500, 8500, or 15000.
 Use bathScope only as 0, 2000, 5500, or 8500.
 Be conservative. Estimate material quantities, rental assumptions, and timeline.`;
 }
-function copyPrompt(){ $("aiPrompt").select(); document.execCommand("copy");}
+function copyPrompt(){ $("aiPrompt").select(); document.execCommand("copy"); setImportStatus("Prompt copied.", true); }
+function cleanJsonText(raw){
+ let text=(raw||"").trim();
+ text=text.replace(/^```json\s*/i,"").replace(/^```\s*/,"").replace(/```$/,"").trim();
+ const first=text.indexOf("{"), last=text.lastIndexOf("}");
+ if(first!==-1 && last!==-1 && last>first){ text=text.slice(first,last+1); }
+ text=text.replace(/[“”]/g,'"').replace(/[‘’]/g,"'");
+ return text;
+}
+function parseJsonFromBox(){
+ const cleaned=cleanJsonText($("aiJson").value);
+ $("aiJson").value=cleaned;
+ return JSON.parse(cleaned);
+}
+function setImportStatus(msg, ok){
+ $("importStatus").className=ok?"success":"error";
+ $("importStatus").textContent=msg;
+}
+function validateJsonOnly(){
+ try{
+  const d=parseJsonFromBox();
+  const keys=Object.keys(d);
+  const supported=keys.filter(k=>importMap[k]);
+  const unsupported=keys.filter(k=>!importMap[k] && k!=="notes");
+  setImportStatus(`Valid JSON ✅
+Supported fields found: ${supported.length}
+${unsupported.length ? "Ignored fields: "+unsupported.join(", ") : "No unsupported fields."}`, true);
+ }catch(e){
+  setImportStatus(`Invalid JSON ❌
+${e.message}
+
+Make sure you pasted only one JSON object and not extra text.`, false);
+ }
+}
 function importJson(){
  try{
-  const d=JSON.parse($("aiJson").value);
-  Object.keys(d).forEach(k=>{ if($(k)&&d[k]!==""&&d[k]!=null) $(k).value=d[k]; });
-  $("importStatus").textContent="Imported successfully.";
+  const d=parseJsonFromBox();
+  let updated=[], ignored=[];
+  Object.keys(d).forEach(k=>{
+    if(importMap[k] && $(importMap[k]) && d[k]!=="" && d[k]!==null && d[k]!==undefined){
+      $(importMap[k]).value=d[k];
+      updated.push(k);
+    } else if(k!=="notes") {
+      ignored.push(k);
+    }
+  });
+  if(d.mortgage!==undefined) $("holdMortgage").value=d.mortgage;
+  if(d.taxes!==undefined) $("holdTaxes").value=d.taxes;
+  if(d.insurance!==undefined) $("holdInsurance").value=d.insurance;
+  if(d.utilities!==undefined) $("holdUtilities").value=d.utilities;
   calc();
- }catch(e){ $("importStatus").textContent="Import failed. Paste valid JSON only."; }
+  showTab("deal", document.querySelector('[onclick*="deal"]'));
+  setImportStatus(`Imported successfully ✅
+Updated fields: ${updated.join(", ")}
+${ignored.length ? "Ignored fields: "+ignored.join(", ") : ""}`, true);
+ }catch(e){
+  setImportStatus(`Import failed ❌
+${e.message}
+
+Tip: Tap "Paste Sample" to test the importer.`, false);
+ }
 }
-function saveDeal(){let d=calc(), deals=JSON.parse(localStorage.getItem("dealsv6")||"[]");deals.unshift(d);localStorage.setItem("dealsv6",JSON.stringify(deals));renderSaved()}
-function renderSaved(){let deals=JSON.parse(localStorage.getItem("dealsv6")||"[]");$("savedDeals").innerHTML=deals.length?deals.map((d,i)=>`<div class="saved-card"><b>${d.address}</b><br>${d.date} • ${d.strategy}<br>Profit: ${money(d.flipProfit)} • Cash flow: ${money(d.cashFlow)}/mo<br><button onclick="deleteDeal(${i})">Delete</button></div>`).join(""):"No saved deals yet."}
-function deleteDeal(i){let deals=JSON.parse(localStorage.getItem("dealsv6")||"[]");deals.splice(i,1);localStorage.setItem("dealsv6",JSON.stringify(deals));renderSaved()}
-function clearDeals(){localStorage.removeItem("dealsv6");renderSaved()}
+function pasteSampleJson(){
+ $("aiJson").value=JSON.stringify({"address":"308 17th St NW, Willmar, MN 56201","purchasePrice":145000,"arv":220000,"sqft":1134,"roofSquares":18,"sidingSquares":16,"soffitLf":160,"windows":10,"doors":2,"lvpSqft":900,"paintSqft":2200,"kitchenScope":8500,"bathScope":5500,"miscRepairs":4500,"rent":2200,"mortgage":1732,"taxes":225,"insurance":125,"utilities":250,"demoWeeks":1,"exteriorWeeks":2,"interiorWeeks":4,"punchWeeks":1,"listingWeeks":2,"closingWeeks":4,"notes":"Sample import."}, null, 2);
+}
+function saveDeal(){let d=calc(), deals=JSON.parse(localStorage.getItem("dealsv7")||"[]");deals.unshift(d);localStorage.setItem("dealsv7",JSON.stringify(deals));renderSaved()}
+function renderSaved(){let deals=JSON.parse(localStorage.getItem("dealsv7")||"[]");$("savedDeals").innerHTML=deals.length?deals.map((d,i)=>`<div class="saved-card"><b>${d.address}</b><br>${d.date} • ${d.strategy}<br>Profit: ${money(d.flipProfit)} • Cash flow: ${money(d.cashFlow)}/mo<br><button onclick="deleteDeal(${i})">Delete</button></div>`).join(""):"No saved deals yet."}
+function deleteDeal(i){let deals=JSON.parse(localStorage.getItem("dealsv7")||"[]");deals.splice(i,1);localStorage.setItem("dealsv7",JSON.stringify(deals));renderSaved()}
+function clearDeals(){localStorage.removeItem("dealsv7");renderSaved()}
 ids.forEach(id=>$(id).addEventListener("input",calc));ids.forEach(id=>$(id).addEventListener("change",calc));calc();renderSaved();buildPrompt();

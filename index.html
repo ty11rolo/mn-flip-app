@@ -3,13 +3,13 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>MN Flip Pro v6</title>
+  <title>MN Flip Pro v7</title>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
 <div class="app">
   <aside>
-    <h1>MN Flip Pro v6</h1>
+    <h1>MN Flip Pro v7</h1>
     <button class="tabbtn active" onclick="showTab('dash', this)">Dashboard</button>
     <button class="tabbtn" onclick="showTab('analyze', this)">Analyze Listing</button>
     <button class="tabbtn" onclick="showTab('deal', this)">Deal Analyzer</button>
@@ -22,7 +22,7 @@
     <section id="dash" class="tab active">
       <div class="hero">
         <h2>Flip + Rental Analyzer</h2>
-        <p>Version 6 adds a cleaner listing workflow, photo notes, timeline holding costs, and a stronger report.</p>
+        <p>Version 7 fixes JSON import, adds validation, and shows clear import errors.</p>
       </div>
       <div class="cards">
         <div class="card"><span>Rehab</span><strong id="dashRehab"></strong></div>
@@ -42,23 +42,26 @@
           <label>Price <input id="aiPrice" type="number" placeholder="Price"></label>
           <label>Sq Ft <input id="aiSqft" type="number" placeholder="Square feet"></label>
           <label>Beds/Baths <input id="aiBedsBaths" placeholder="3 bed / 1 bath"></label>
-          <label>Listing Notes <textarea id="aiNotes" placeholder="Paste description, walkthrough notes, or MLS notes"></textarea></label>
+          <label>Listing Notes <textarea id="aiNotes" placeholder="Paste listing description, walkthrough notes, or MLS notes"></textarea></label>
           <label>Photo Notes <textarea id="photoNotes" placeholder="Example: roof looks old, vinyl siding worn, kitchen dated, bathroom needs full remodel"></textarea></label>
           <button onclick="buildPrompt()">Build ChatGPT Prompt</button>
           <button onclick="copyPrompt()">Copy Prompt</button>
         </div>
 
-        <div class="card wide">
+        <div class="card">
           <h2>Prompt For ChatGPT</h2>
-          <p>Paste this into ChatGPT with listing screenshots/photos. Then copy the JSON result back below.</p>
+          <p class="small">Paste this into ChatGPT with listing screenshots/photos. Then copy the JSON result back below.</p>
           <textarea id="aiPrompt" class="big"></textarea>
         </div>
 
-        <div class="card wide">
+        <div class="card">
           <h2>Import AI Result</h2>
+          <p class="small">Paste only the JSON object. Version 7 will clean common markdown/code-block formatting automatically.</p>
           <textarea id="aiJson" class="big" placeholder='Paste JSON here'></textarea>
-          <button onclick="importJson()">Import Into Analyzer</button>
-          <p id="importStatus"></p>
+          <button onclick="validateJsonOnly()">Validate JSON</button>
+          <button onclick="importJson()">Import + Analyze</button>
+          <button onclick="pasteSampleJson()">Paste Sample</button>
+          <pre id="importStatus"></pre>
         </div>
       </div>
     </section>
@@ -125,7 +128,7 @@
           <label>Mortgage <input id="mortgage" type="number" value="1732"></label>
           <label>Taxes <input id="taxes" type="number" value="225"></label>
           <label>Insurance <input id="insurance" type="number" value="125"></label>
-          <label>Utilities <input id="utilities" type="number" value="0"></label>
+          <label>Utilities <input id="utilities" type="number" value="250"></label>
           <label>Vacancy % <input id="vacancyPct" type="number" value=".05" step=".01"></label>
           <label>Maintenance % <input id="maintenancePct" type="number" value=".08" step=".01"></label>
         </div>
