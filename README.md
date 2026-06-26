@@ -1,18 +1,17 @@
-# Minnesota Flip + Rental Analyzer
+# MN Flip Pro v5
 
-A simple first-version web app based on the Version 3 spreadsheet idea.
+Features:
+- Dashboard
+- Flip analyzer
+- Rental analyzer
+- Rehab/material estimator
+- Editable pricing database
+- Saved deals in browser storage
+- Printable report
+- Mobile-friendly layout
 
-## How to use
-Open `index.html` in a browser.
-
-## What it does
-- Estimates flip total investment, net profit, ROI, and max offer
-- Estimates rental cash flow, cap rate, and cash-on-cash return
-- Gives a simple strategy recommendation: Flip, Rental, Possible Deal, or Pass
-
-## Next improvements
-- Save properties
-- Add material calculator
-- Add ARV comps
-- Add pricing database
-- Add project tracker
+To update your Vercel site:
+1. Open your GitHub repo.
+2. Replace index.html, styles.css, and app.js with these files.
+3. Commit changes.
+4. Vercel redeploys automatically.
