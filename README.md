@@ -1,17 +1,14 @@
-# MN Flip Pro v5
+# MN Flip Pro - AI Listing Assist
 
-Features:
-- Dashboard
-- Flip analyzer
-- Rental analyzer
-- Rehab/material estimator
-- Editable pricing database
-- Saved deals in browser storage
-- Printable report
-- Mobile-friendly layout
+This version adds a free AI-assisted workflow:
+1. Paste a Zillow/listing URL and known details.
+2. Build a ChatGPT prompt.
+3. Paste the prompt into ChatGPT with listing photos/screenshots.
+4. Paste the JSON result back into the app.
+5. Import it into the analyzer.
 
-To update your Vercel site:
-1. Open your GitHub repo.
-2. Replace index.html, styles.css, and app.js with these files.
-3. Commit changes.
-4. Vercel redeploys automatically.
+Replace these files in GitHub:
+- index.html
+- styles.css
+- app.js
+- README.md
