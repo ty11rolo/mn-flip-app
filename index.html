@@ -3,57 +3,60 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>MN Flip Pro - AI Assist</title>
+  <title>MN Flip Pro v6</title>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
 <div class="app">
   <aside>
-    <h1>MN Flip Pro</h1>
+    <h1>MN Flip Pro v6</h1>
     <button class="tabbtn active" onclick="showTab('dash', this)">Dashboard</button>
-    <button class="tabbtn" onclick="showTab('ai', this)">AI Listing Assist</button>
+    <button class="tabbtn" onclick="showTab('analyze', this)">Analyze Listing</button>
     <button class="tabbtn" onclick="showTab('deal', this)">Deal Analyzer</button>
+    <button class="tabbtn" onclick="showTab('timeline', this)">Timeline</button>
     <button class="tabbtn" onclick="showTab('saved', this)">Saved Deals</button>
+    <button class="tabbtn" onclick="showTab('report', this)">Report</button>
   </aside>
 
   <main>
     <section id="dash" class="tab active">
       <div class="hero">
         <h2>Flip + Rental Analyzer</h2>
-        <p>Now includes AI-assisted listing analysis without paid API costs.</p>
+        <p>Version 6 adds a cleaner listing workflow, photo notes, timeline holding costs, and a stronger report.</p>
       </div>
       <div class="cards">
         <div class="card"><span>Rehab</span><strong id="dashRehab"></strong></div>
+        <div class="card"><span>Holding Cost</span><strong id="dashHolding"></strong></div>
         <div class="card"><span>Flip Profit</span><strong id="dashProfit"></strong></div>
         <div class="card"><span>Rental Cash Flow</span><strong id="dashCash"></strong></div>
         <div class="card"><span>Strategy</span><strong id="dashStrategy"></strong></div>
       </div>
     </section>
 
-    <section id="ai" class="tab">
+    <section id="analyze" class="tab">
       <div class="grid">
         <div class="card">
-          <h2>AI Listing Assist</h2>
+          <h2>Analyze Listing</h2>
           <label>Zillow/List URL <input id="listingUrl" placeholder="Paste Zillow URL"></label>
-          <label>Known Address <input id="aiAddress" placeholder="Address"></label>
-          <label>Known Price <input id="aiPrice" type="number" placeholder="Price"></label>
-          <label>Known Sq Ft <input id="aiSqft" type="number" placeholder="Square feet"></label>
-          <label>Known Beds/Baths <input id="aiBedsBaths" placeholder="3 bed / 1 bath"></label>
-          <label>Notes / Listing Description <textarea id="aiNotes"></textarea></label>
+          <label>Address <input id="aiAddress" placeholder="Address"></label>
+          <label>Price <input id="aiPrice" type="number" placeholder="Price"></label>
+          <label>Sq Ft <input id="aiSqft" type="number" placeholder="Square feet"></label>
+          <label>Beds/Baths <input id="aiBedsBaths" placeholder="3 bed / 1 bath"></label>
+          <label>Listing Notes <textarea id="aiNotes" placeholder="Paste description, walkthrough notes, or MLS notes"></textarea></label>
+          <label>Photo Notes <textarea id="photoNotes" placeholder="Example: roof looks old, vinyl siding worn, kitchen dated, bathroom needs full remodel"></textarea></label>
           <button onclick="buildPrompt()">Build ChatGPT Prompt</button>
-        </div>
-
-        <div class="card">
-          <h2>Copy Prompt</h2>
-          <p>Paste this into ChatGPT with listing screenshots/photos. Ask it to return JSON only.</p>
-          <textarea id="aiPrompt" class="big"></textarea>
           <button onclick="copyPrompt()">Copy Prompt</button>
         </div>
 
-        <div class="card">
+        <div class="card wide">
+          <h2>Prompt For ChatGPT</h2>
+          <p>Paste this into ChatGPT with listing screenshots/photos. Then copy the JSON result back below.</p>
+          <textarea id="aiPrompt" class="big"></textarea>
+        </div>
+
+        <div class="card wide">
           <h2>Import AI Result</h2>
-          <p>Paste the JSON response from ChatGPT here.</p>
-          <textarea id="aiJson" class="big"></textarea>
+          <textarea id="aiJson" class="big" placeholder='Paste JSON here'></textarea>
           <button onclick="importJson()">Import Into Analyzer</button>
           <p id="importStatus"></p>
         </div>
@@ -66,9 +69,8 @@
           <h2>Property</h2>
           <label>Address <input id="address" value="308 17th St NW, Willmar, MN"></label>
           <label>Purchase Price <input id="purchasePrice" type="number" value="145000"></label>
-          <label>ARV <input id="arv" type="number" value="245000"></label>
+          <label>ARV <input id="arv" type="number" value="220000"></label>
           <label>Square Feet <input id="sqft" type="number" value="1134"></label>
-          <label>Holding Months <input id="holdingMonths" type="number" value="6"></label>
         </div>
 
         <div class="card">
@@ -96,11 +98,11 @@
               <option value="8500">Higher-end</option>
             </select>
           </label>
-          <label>Misc Repairs <input id="miscRepairs" type="number" value="3000"></label>
+          <label>Misc Repairs <input id="miscRepairs" type="number" value="4500"></label>
         </div>
 
         <div class="card">
-          <h2>Pricing + Assumptions</h2>
+          <h2>Pricing</h2>
           <label>Roof / Square <input id="roofPrice" type="number" value="275"></label>
           <label>Siding / Square <input id="sidingPrice" type="number" value="475"></label>
           <label>Soffit/Fascia / LF <input id="soffitPrice" type="number" value="18"></label>
@@ -113,14 +115,13 @@
 
         <div class="card">
           <h2>Flip</h2>
-          <label>Monthly Holding Cost <input id="monthlyHolding" type="number" value="1200"></label>
           <label>Buying Closing Costs <input id="buyClosing" type="number" value="3500"></label>
           <label>Selling Cost % <input id="sellingPct" type="number" value=".07" step=".01"></label>
         </div>
 
         <div class="card">
           <h2>Rental</h2>
-          <label>Monthly Rent <input id="rent" type="number" value="2400"></label>
+          <label>Monthly Rent <input id="rent" type="number" value="2200"></label>
           <label>Mortgage <input id="mortgage" type="number" value="1732"></label>
           <label>Taxes <input id="taxes" type="number" value="225"></label>
           <label>Insurance <input id="insurance" type="number" value="125"></label>
@@ -132,13 +133,46 @@
         <div class="card result">
           <h2>Results</h2>
           <div><span>Rehab</span><strong id="rehabTotal"></strong></div>
+          <div><span>Holding Cost</span><strong id="holdingTotal"></strong></div>
           <div><span>Flip Investment</span><strong id="flipInvestment"></strong></div>
           <div><span>Flip Profit</span><strong id="flipProfit"></strong></div>
           <div><span>Flip ROI</span><strong id="flipRoi"></strong></div>
+          <div><span>Max Offer 70%</span><strong id="maxOffer"></strong></div>
           <div><span>Cash Flow</span><strong id="cashFlow"></strong></div>
           <div><span>Cap Rate</span><strong id="capRate"></strong></div>
           <div id="recommendation"></div>
           <button onclick="saveDeal()">Save Deal</button>
+          <button onclick="window.print()">Print</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="timeline" class="tab">
+      <div class="grid">
+        <div class="card">
+          <h2>Timeline Planner</h2>
+          <label>Demo Weeks <input id="demoWeeks" type="number" value="1"></label>
+          <label>Exterior Weeks <input id="exteriorWeeks" type="number" value="2"></label>
+          <label>Interior Weeks <input id="interiorWeeks" type="number" value="4"></label>
+          <label>Final Punch/List Week <input id="punchWeeks" type="number" value="1"></label>
+          <label>Listing Weeks <input id="listingWeeks" type="number" value="2"></label>
+          <label>Closing Weeks <input id="closingWeeks" type="number" value="4"></label>
+        </div>
+        <div class="card">
+          <h2>Monthly Holding Cost Breakdown</h2>
+          <label>Mortgage / Financing <input id="holdMortgage" type="number" value="1732"></label>
+          <label>Taxes <input id="holdTaxes" type="number" value="225"></label>
+          <label>Insurance <input id="holdInsurance" type="number" value="125"></label>
+          <label>Utilities <input id="holdUtilities" type="number" value="250"></label>
+          <label>Lawn/Snow <input id="holdLawn" type="number" value="75"></label>
+          <label>Misc <input id="holdMisc" type="number" value="100"></label>
+        </div>
+        <div class="card result">
+          <h2>Timeline Results</h2>
+          <div><span>Total Weeks</span><strong id="totalWeeks"></strong></div>
+          <div><span>Total Months</span><strong id="totalMonths"></strong></div>
+          <div><span>Monthly Holding</span><strong id="monthlyHoldingCalc"></strong></div>
+          <div><span>Total Holding</span><strong id="timelineHolding"></strong></div>
         </div>
       </div>
     </section>
@@ -147,6 +181,15 @@
       <div class="card">
         <h2>Saved Deals</h2>
         <div id="savedDeals"></div>
+        <button onclick="clearDeals()">Clear Saved Deals</button>
+      </div>
+    </section>
+
+    <section id="report" class="tab">
+      <div class="card report">
+        <h2>Deal Report</h2>
+        <pre id="reportText"></pre>
+        <button onclick="window.print()">Print / Save PDF</button>
       </div>
     </section>
   </main>

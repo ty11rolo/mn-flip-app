@@ -1,11 +1,14 @@
-# MN Flip Pro - AI Listing Assist
+# MN Flip Pro v6
 
-This version adds a free AI-assisted workflow:
-1. Paste a Zillow/listing URL and known details.
-2. Build a ChatGPT prompt.
-3. Paste the prompt into ChatGPT with listing photos/screenshots.
-4. Paste the JSON result back into the app.
-5. Import it into the analyzer.
+New in Version 6:
+- Analyze Listing workflow
+- ChatGPT prompt builder
+- JSON import into analyzer
+- Photo notes field
+- Timeline planner
+- Monthly holding cost breakdown
+- Holding costs now calculated from timeline
+- Better printable report
 
 Replace these files in GitHub:
 - index.html
