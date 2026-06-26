@@ -1,0 +1,74 @@
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #f4f6f8;
+  color: #172033;
+}
+.app { max-width: 1200px; margin: 0 auto; padding: 24px; }
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+h1 { margin: 0; font-size: 28px; }
+p { color: #5b667a; }
+button {
+  border: 0;
+  padding: 10px 16px;
+  border-radius: 10px;
+  background: #172033;
+  color: white;
+  cursor: pointer;
+}
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(260px, 1fr));
+  gap: 18px;
+}
+.card {
+  background: white;
+  border-radius: 18px;
+  padding: 20px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+}
+.card h2 { margin-top: 0; font-size: 20px; }
+label {
+  display: block;
+  margin: 12px 0;
+  font-size: 14px;
+  color: #384255;
+}
+input {
+  width: 100%;
+  margin-top: 6px;
+  padding: 11px;
+  border-radius: 10px;
+  border: 1px solid #d8dee8;
+  font-size: 15px;
+}
+.metric {
+  display: flex;
+  justify-content: space-between;
+  padding: 14px 0;
+  border-bottom: 1px solid #edf0f4;
+}
+.metric strong { font-size: 18px; }
+.recommendation { grid-column: span 1; }
+#recommendationBox {
+  padding: 18px;
+  border-radius: 14px;
+  background: #eef7ef;
+  font-size: 22px;
+  font-weight: 700;
+}
+.note { font-size: 13px; }
+.good { background: #eef7ef !important; color: #1f6b35; }
+.ok { background: #fff7e6 !important; color: #8a5a00; }
+.bad { background: #fdecec !important; color: #9b1c1c; }
+
+@media (max-width: 900px) {
+  .grid { grid-template-columns: 1fr; }
+  header { align-items: flex-start; gap: 14px; }
+}

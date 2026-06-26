@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Minnesota Flip + Rental Analyzer</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="app">
+    <header>
+      <div>
+        <h1>Minnesota Flip + Rental Analyzer</h1>
+        <p>Compare flip vs rental potential before making an offer.</p>
+      </div>
+      <button id="resetBtn">Reset</button>
+    </header>
+
+    <main class="grid">
+      <section class="card">
+        <h2>Property Inputs</h2>
+        <label>Property Address <input id="address" placeholder="308 17th St NW, Willmar, MN" /></label>
+        <label>Purchase Price <input id="purchasePrice" type="number" value="145000" /></label>
+        <label>After Repair Value (ARV) <input id="arv" type="number" value="245000" /></label>
+        <label>Estimated Rehab <input id="rehab" type="number" value="42000" /></label>
+        <label>Square Feet <input id="sqft" type="number" value="1134" /></label>
+        <label>Holding Months <input id="holdingMonths" type="number" value="6" /></label>
+      </section>
+
+      <section class="card">
+        <h2>Flip Assumptions</h2>
+        <label>Monthly Holding Cost <input id="monthlyHolding" type="number" value="1200" /></label>
+        <label>Buying Closing Costs <input id="buyClosing" type="number" value="3500" /></label>
+        <label>Selling Cost % <input id="sellingPct" type="number" step="0.01" value="0.07" /></label>
+        <label>Contingency % <input id="contingencyPct" type="number" step="0.01" value="0.15" /></label>
+      </section>
+
+      <section class="card">
+        <h2>Rental Assumptions</h2>
+        <label>Monthly Rent <input id="rent" type="number" value="2400" /></label>
+        <label>Monthly Utilities Paid by Owner <input id="utilities" type="number" value="0" /></label>
+        <label>Monthly Mortgage Payment <input id="mortgage" type="number" value="1732" /></label>
+        <label>Property Tax / Month <input id="taxes" type="number" value="225" /></label>
+        <label>Insurance / Month <input id="insurance" type="number" value="125" /></label>
+        <label>Vacancy % <input id="vacancyPct" type="number" step="0.01" value="0.05" /></label>
+        <label>Maintenance % of Rent <input id="maintenancePct" type="number" step="0.01" value="0.08" /></label>
+        <label>Management % of Rent <input id="managementPct" type="number" step="0.01" value="0.00" /></label>
+      </section>
+
+      <section class="card results">
+        <h2>Flip Results</h2>
+        <div class="metric"><span>Total Investment</span><strong id="flipInvestment"></strong></div>
+        <div class="metric"><span>Net Profit</span><strong id="flipProfit"></strong></div>
+        <div class="metric"><span>ROI</span><strong id="flipRoi"></strong></div>
+        <div class="metric"><span>Max Offer - 70% Rule</span><strong id="maxOffer70"></strong></div>
+      </section>
+
+      <section class="card results">
+        <h2>Rental Results</h2>
+        <div class="metric"><span>Monthly Cash Flow</span><strong id="cashFlow"></strong></div>
+        <div class="metric"><span>Annual Cash Flow</span><strong id="annualCashFlow"></strong></div>
+        <div class="metric"><span>Cap Rate</span><strong id="capRate"></strong></div>
+        <div class="metric"><span>Cash-on-Cash Return</span><strong id="coc"></strong></div>
+      </section>
+
+      <section class="card recommendation">
+        <h2>Recommendation</h2>
+        <div id="recommendationBox"></div>
+        <p class="note">This is a deal-screening tool, not a formal appraisal or lender analysis.</p>
+      </section>
+    </main>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
