@@ -3,16 +3,17 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>MN Flip Pro v8</title>
+  <title>MN Flip Pro v10</title>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
 <div class="app">
   <aside>
-    <h1>MN Flip Pro v8</h1>
+    <h1>MN Flip Pro v10</h1>
     <button class="tabbtn active" onclick="showTab('dash', this)">Dashboard</button>
     <button class="tabbtn" onclick="showTab('analyze', this)">Analyze Listing</button>
     <button class="tabbtn" onclick="showTab('deal', this)">Deal Analyzer</button>
+    <button class="tabbtn" onclick="showTab('scenarios', this)">DIY vs Hire</button>
     <button class="tabbtn" onclick="showTab('timeline', this)">Timeline</button>
     <button class="tabbtn" onclick="showTab('saved', this)">Saved Deals</button>
     <button class="tabbtn" onclick="showTab('report', this)">Report</button>
@@ -21,12 +22,12 @@
   <main>
     <section id="dash" class="tab active">
       <div class="hero">
-        <h2>Flip + Rental Analyzer</h2>
-        <p>Version 8 adds separate flip/rental pass probabilities, clearer explanations, and better number formatting.</p>
+        <h2>Flip + Rental Investor Platform</h2>
+        <p>Version 10 adds DIY / Hybrid / Contractor pricing and side-by-side deal comparisons.</p>
       </div>
       <div class="cards">
+        <div class="card"><span>Mode</span><strong id="dashMode"></strong></div>
         <div class="card"><span>Rehab</span><strong id="dashRehab"></strong></div>
-        <div class="card"><span>Holding Cost</span><strong id="dashHolding"></strong></div>
         <div class="card"><span>Flip Profit</span><strong id="dashProfit"></strong></div>
         <div class="card"><span>Rental Cash Flow</span><strong id="dashCash"></strong></div>
       </div>
@@ -50,27 +51,23 @@
       <div class="grid">
         <div class="card">
           <h2>Analyze Listing</h2>
-          <label>Zillow/List URL <input id="listingUrl" placeholder="Paste Zillow URL"></label>
-          <p class="small"><b>Current free workflow:</b> paste the URL and details, build a ChatGPT prompt, then import JSON.</p>
-          <p class="small"><b>Full auto Zillow import:</b> needs a backend/API because a static browser app cannot reliably read Zillow pages directly.</p>
+          <label>Listing URL / Reference <input id="listingUrl" placeholder="Optional reference link"></label>
           <label>Address <input id="aiAddress" placeholder="Address"></label>
           <label>Price <input id="aiPrice" type="number" placeholder="Price"></label>
           <label>Sq Ft <input id="aiSqft" type="number" placeholder="Square feet"></label>
           <label>Beds/Baths <input id="aiBedsBaths" placeholder="3 bed / 1 bath"></label>
-          <label>Listing Notes <textarea id="aiNotes" placeholder="Paste listing description, walkthrough notes, or MLS notes"></textarea></label>
-          <label>Photo Notes <textarea id="photoNotes" placeholder="Example: roof looks old, vinyl siding worn, kitchen dated, bathroom needs full remodel"></textarea></label>
+          <label>Listing Notes <textarea id="aiNotes"></textarea></label>
+          <label>Photo Notes <textarea id="photoNotes"></textarea></label>
           <button onclick="buildPrompt()">Build ChatGPT Prompt</button>
           <button onclick="copyPrompt()">Copy Prompt</button>
         </div>
-
         <div class="card">
-          <h2>Prompt For ChatGPT</h2>
+          <h2>Prompt</h2>
           <textarea id="aiPrompt" class="big"></textarea>
         </div>
-
         <div class="card">
           <h2>Import AI Result</h2>
-          <textarea id="aiJson" class="big" placeholder='Paste JSON here'></textarea>
+          <textarea id="aiJson" class="big" placeholder="Paste JSON here"></textarea>
           <button onclick="validateJsonOnly()">Validate JSON</button>
           <button onclick="importJson()">Import + Analyze</button>
           <button onclick="pasteSampleJson()">Paste Sample</button>
@@ -90,6 +87,22 @@
         </div>
 
         <div class="card">
+          <h2>Pricing Model</h2>
+          <label>Mode
+            <select id="pricingMode">
+              <option value="diy">DIY</option>
+              <option value="hybrid" selected>Hybrid</option>
+              <option value="contractor">Contractor</option>
+            </select>
+          </label>
+          <p class="small"><b>DIY:</b> material-heavy.<br><b>Hybrid:</b> DIY easy work, hire major trades.<br><b>Contractor:</b> mostly hired out.</p>
+          <label>Target Flip Profit <input id="targetProfit" type="number" value="30000"></label>
+          <label>Target Flip ROI % <input id="targetRoi" type="number" value=".15" step=".01"></label>
+          <label>Target Rental Cash Flow <input id="targetCashFlow" type="number" value="250"></label>
+          <label>Target Cap Rate % <input id="targetCapRate" type="number" value=".06" step=".01"></label>
+        </div>
+
+        <div class="card">
           <h2>Rehab Scope</h2>
           <label>Roof Squares <input id="roofSquares" type="number" value="18"></label>
           <label>Siding Squares <input id="sidingSquares" type="number" value="16"></label>
@@ -101,24 +114,24 @@
           <label>Kitchen Scope
             <select id="kitchenScope">
               <option value="0">None</option>
-              <option value="3500">Light - $3,500</option>
-              <option value="8500" selected>Medium - $8,500</option>
-              <option value="15000">Full - $15,000</option>
+              <option value="1">Light</option>
+              <option value="2" selected>Medium</option>
+              <option value="3">Full</option>
             </select>
           </label>
           <label>Bathroom Scope
             <select id="bathScope">
               <option value="0">None</option>
-              <option value="2000">Light - $2,000</option>
-              <option value="5500" selected>Full - $5,500</option>
-              <option value="8500">Higher-end - $8,500</option>
+              <option value="1">Light</option>
+              <option value="2" selected>Full</option>
+              <option value="3">Higher-end</option>
             </select>
           </label>
           <label>Misc Repairs <input id="miscRepairs" type="number" value="4500"></label>
         </div>
 
         <div class="card">
-          <h2>Pricing</h2>
+          <h2>Base DIY Pricing</h2>
           <label>Roof / Square <input id="roofPrice" type="number" value="275"></label>
           <label>Siding / Square <input id="sidingPrice" type="number" value="475"></label>
           <label>Soffit/Fascia / LF <input id="soffitPrice" type="number" value="18"></label>
@@ -133,8 +146,6 @@
           <h2>Flip</h2>
           <label>Buying Closing Costs <input id="buyClosing" type="number" value="3500"></label>
           <label>Selling Cost % <input id="sellingPct" type="number" value=".07" step=".01"></label>
-          <label>Target Minimum Profit <input id="targetProfit" type="number" value="30000"></label>
-          <label>Target ROI % <input id="targetRoi" type="number" value=".15" step=".01"></label>
         </div>
 
         <div class="card">
@@ -146,12 +157,10 @@
           <label>Utilities <input id="utilities" type="number" value="250"></label>
           <label>Vacancy % <input id="vacancyPct" type="number" value=".05" step=".01"></label>
           <label>Maintenance % <input id="maintenancePct" type="number" value=".08" step=".01"></label>
-          <label>Target Cash Flow <input id="targetCashFlow" type="number" value="250"></label>
-          <label>Target Cap Rate % <input id="targetCapRate" type="number" value=".06" step=".01"></label>
         </div>
 
         <div class="card result">
-          <h2>Results</h2>
+          <h2>Selected Mode Results</h2>
           <div><span>Rehab</span><strong id="rehabTotal"></strong></div>
           <div><span>Holding Cost</span><strong id="holdingTotal"></strong></div>
           <div><span>Flip Investment</span><strong id="flipInvestment"></strong></div>
@@ -163,6 +172,27 @@
           <div><span>Cap Rate</span><strong id="capRate"></strong></div>
           <button onclick="saveDeal()">Save Deal</button>
           <button onclick="window.print()">Print</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="scenarios" class="tab">
+      <div class="card">
+        <h2>DIY vs Hybrid vs Contractor</h2>
+        <div class="tablewrap">
+          <table>
+            <thead><tr><th>Scenario</th><th>Rehab</th><th>Investment</th><th>Profit</th><th>ROI</th><th>Cash Flow</th><th>Cap Rate</th><th>Flip Vote</th><th>Rental Vote</th></tr></thead>
+            <tbody id="scenarioRows"></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="card">
+        <h2>Cost Breakdown</h2>
+        <div class="tablewrap">
+          <table>
+            <thead><tr><th>Category</th><th>DIY</th><th>Hybrid</th><th>Contractor</th></tr></thead>
+            <tbody id="breakdownRows"></tbody>
+          </table>
         </div>
       </div>
     </section>
@@ -179,7 +209,7 @@
           <label>Closing Weeks <input id="closingWeeks" type="number" value="4"></label>
         </div>
         <div class="card">
-          <h2>Monthly Holding Cost Breakdown</h2>
+          <h2>Monthly Holding Cost</h2>
           <label>Mortgage / Financing <input id="holdMortgage" type="number" value="1732"></label>
           <label>Taxes <input id="holdTaxes" type="number" value="225"></label>
           <label>Insurance <input id="holdInsurance" type="number" value="125"></label>

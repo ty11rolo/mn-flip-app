@@ -1,21 +1,17 @@
-# MN Flip Pro v8
+# MN Flip Pro v10
 
-New in Version 8:
-- Separate Flip Probability and Rental Probability
-- Separate pass/maybe/do-not-pass vote for each strategy
-- Longer explanation for why each strategy received its score
-- More consistent dollar and percentage formatting
-- Added editable target assumptions:
-  - Target flip profit
-  - Target flip ROI
-  - Target rental cash flow
-  - Target cap rate
-- Updated report to include both strategy votes
+New in Version 10:
+- DIY / Hybrid / Contractor pricing model
+- Side-by-side scenario comparison
+- Rehab cost engine with category-level multipliers
+- Cost breakdown table
+- Separate flip/rental probability for each pricing model
+- Better investor report
 
-Important:
-A static GitHub/Vercel site cannot reliably auto-read Zillow listings from only a URL. To make true Zillow URL auto-import work, you need either:
-1. A paid/third-party property data API, or
-2. A backend service that you control and a compliant data source.
+Pricing Model:
+- DIY: material-heavy estimate
+- Hybrid: DIY easy work + hire major trades
+- Contractor: mostly hired-out work
 
 Replace these files in GitHub:
 - index.html
